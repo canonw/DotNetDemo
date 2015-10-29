@@ -79,7 +79,6 @@ namespace MultiTenantWebApi
         public IEnumerable<Assembly> LoadAssemblies()
         {
             // TODO: Fix path loading
-            // TODO: If plugin modified by not webapp.  plugin should not locked
             var plugInPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "bin");
             var directory = new DirectoryInfo(plugInPath);
             var files = directory.GetFiles("*.dll", SearchOption.TopDirectoryOnly);
