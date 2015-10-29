@@ -4,10 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTenantWebApi", "MultiTenantWebApi\MultiTenantWebApi.csproj", "{5AC88D8A-039D-4106-AF42-FD883638D5DE}"
-	ProjectSection(ProjectDependencies) = postProject
-		{26079AB7-C07B-413C-B4F4-840FC886D6FA} = {26079AB7-C07B-413C-B4F4-840FC886D6FA}
-		{335384D2-CFD4-4672-877E-0A925DE9F08C} = {335384D2-CFD4-4672-877E-0A925DE9F08C}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTenantWebApi.Tests", "MultiTenantWebApi.Tests\MultiTenantWebApi.Tests.csproj", "{F2B5E3A4-6FD0-4D04-BEC3-8969D845C5E0}"
 EndProject

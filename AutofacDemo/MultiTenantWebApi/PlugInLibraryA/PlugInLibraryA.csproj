@@ -87,7 +87,10 @@
     <PreBuildEvent>del "$(SolutionDir)\bin\$(TargetName).*"</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetName).*" "$(SolutionDir)bin"</PostBuildEvent>
+    <PostBuildEvent>@REM Poor man effort to trick webap to reload
+copy /b $(SolutionDir)MultiTenantWebApi\Properties\AssemblyInfo.cs+,,
+copy "$(TargetName).*" "$(SolutionDir)bin"
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
