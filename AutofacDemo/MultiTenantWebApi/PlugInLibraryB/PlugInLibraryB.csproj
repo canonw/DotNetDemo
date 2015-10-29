@@ -66,13 +66,14 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>@REM Poor man effort to trick webap to reload
-copy /b $(SolutionDir)MultiTenantWebApi\Global.asax.cs +,,
-copy "$(TargetName).*" "$(SolutionDir)bin"
-</PostBuildEvent>
+    <PostBuildEvent>@REM Poorman effort to force restart webapp and reload this assembly seemlessly
+powershell -NoProfile -Command (Get-Item "$(SolutionDir)MultiTenantWebApi\Web.config").lastwritetime=(Get-Date)
+
+copy "$(TargetName).*" "$(SolutionDir)bin"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>del "$(SolutionDir)\bin\$(TargetName).*"</PreBuildEvent>
+    <PreBuildEvent>if not exist "$(SolutionDir)\bin" mkdir "$(SolutionDir)\bin" 
+del "$(SolutionDir)\bin\$(TargetName).*"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

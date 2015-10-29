@@ -79,20 +79,20 @@ namespace MultiTenantWebApi
         public IEnumerable<Assembly> LoadAssemblies()
         {
             // TODO: Fix path loading
-            var plugInPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "plugins");
-            //var plugInPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "bin");
+            //var plugInPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "plugins");
+            var plugInPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "bin");
             
             var directory = new DirectoryInfo(plugInPath);
             var files = directory.GetFiles("*.dll", SearchOption.TopDirectoryOnly);
 
             foreach (var file in files)
             {
-                var assemblyName = AssemblyName.GetAssemblyName(file.FullName);
-                var assembly = AppDomain.CurrentDomain.Load(assemblyName);
+                //var assemblyName = AssemblyName.GetAssemblyName(file.FullName);
+                //var assembly = AppDomain.CurrentDomain.Load(assemblyName);
 
                 // This releases the DLL from locking during dev.
-                //byte[] assemblyBytes = File.ReadAllBytes(file.FullName);
-                //var assembly = Assembly.Load(assemblyBytes);
+                byte[] assemblyBytes = File.ReadAllBytes(file.FullName);
+                var assembly = Assembly.Load(assemblyBytes);
 
                 yield return assembly;
             }
