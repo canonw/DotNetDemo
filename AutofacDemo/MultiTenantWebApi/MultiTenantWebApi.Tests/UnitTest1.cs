@@ -19,7 +19,7 @@ namespace MultiTenantWebApi.Tests
             var content = response.Content;
 
             // Assert
-            Assert.AreEqual("\"HelloManager says Hi\"", content);
+            Assert.AreEqual("\"SharedLib says Hi\"", content);
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace MultiTenantWebApi.Tests
             var content = response.Content;
 
             // Assert
-            var expected = "\"A says Hi\"";
+            var expected = "\"PlugInA says Hi\"";
             Assert.AreEqual(expected, content);
         }
 
@@ -52,7 +52,7 @@ namespace MultiTenantWebApi.Tests
             var content = response.Content;
 
             // Assert
-            Assert.AreEqual("\"B says Hi\"", content);
+            Assert.AreEqual("\"PlugInB says Hi\"", content);
         }
     }
 }

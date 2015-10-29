@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Web;
@@ -8,8 +9,10 @@ using System.Web.Http.Dependencies;
 using System.Web.Routing;
 using Autofac;
 using Autofac.Extras.Multitenant;
+using Autofac.Extras.Multitenant.Web;
 using Autofac.Integration.WebApi;
-using MultiTenantWebApi.Managers;
+using SharedLib;
+using SharedLib.Managers;
 
 namespace MultiTenantWebApi
 {
@@ -29,7 +32,11 @@ namespace MultiTenantWebApi
             var builder = new ContainerBuilder();
             var assembly = Assembly.GetExecutingAssembly();
 
-            builder.RegisterType<HelloManager>().As<IHelloManager>().InstancePerDependency();
+            builder.RegisterModule(new SharedLibModule());
+            //builder.RegisterType<HelloManager>().As<IHelloManager>().InstancePerRequest();
+
+            // TODO: Make configurable
+            builder.RegisterType<RequestParameterStrategy>().As<ITenantIdentificationStrategy>();
 
             // Standard API registration
             builder.RegisterWebApiFilterProvider(httpConfiguration);
@@ -37,17 +44,54 @@ namespace MultiTenantWebApi
 
             var container = builder.Build();
 
-            var tenantStrategy = new RequestParameterStrategy();
+            //if (container.IsRegistered<ITenantIdentificationStrategy>())
+
+            var tenantStrategy = container.Resolve<ITenantIdentificationStrategy>();
 
             var mtc = new MultitenantContainer(tenantStrategy, container);
-            mtc.ConfigureTenant("A",
-                b => b.RegisterType<HellloManagerA>().As<IHelloManager>()
-                    .InstancePerDependency());
-            mtc.ConfigureTenant("B",
-                b => b.RegisterType<HellloManagerB>().As<IHelloManager>()
-                    .InstancePerDependency());
+
+            //mtc.ConfigureTenant("A",
+            //    b => b.RegisterType<HellloManagerA>().As<IHelloManager>()
+            //        .InstancePerDependency());
+
+            // Read assembly custom attribute
+            var groupedAssemblies = LoadAssemblies().Select(ass => new
+            {
+                Assembly = ass,
+                TenantAttribute = ass.GetCustomAttribute<TenantAttributeAttribute>()
+            })
+            .Where(o => o.TenantAttribute != null)
+            .GroupBy(o => o.TenantAttribute.TenantId, o => o.Assembly);
+
+            foreach (var group in groupedAssemblies)
+            {
+                // TODO: Log tenant being loaded at info level to give a way to debug issue.
+                var grp = group;
+                mtc.ConfigureTenant(grp.Key, cb =>
+                {
+                    cb.RegisterAssemblyModules(grp.ToArray());
+                });
+            }
 
             return new AutofacWebApiDependencyResolver(mtc);
+        }
+
+        public IEnumerable<Assembly> LoadAssemblies()
+        {
+            // TODO: Fix path loading
+            // TODO: If plugin modified by not webapp.  plugin should not locked
+            var plugInPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "bin");
+            var directory = new DirectoryInfo(plugInPath);
+            var files = directory.GetFiles("*.dll", SearchOption.TopDirectoryOnly);
+
+            foreach (var file in files)
+            {
+                var assemblyName = AssemblyName.GetAssemblyName(file.FullName);
+                var assembly = AppDomain.CurrentDomain.Load(assemblyName);
+                yield return assembly;
+            }
+
+            yield break;
         }
 
         public static IDependencyResolver RegisterBuilderAutofac(HttpConfiguration httpConfiguration)
